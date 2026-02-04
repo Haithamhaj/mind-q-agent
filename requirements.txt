@@ -21,3 +21,4 @@ ruff>=0.1.9
 
 # AI Assistant (Optional)
 aider-chat>=0.30.0
+PyMuPDF==1.25.1
