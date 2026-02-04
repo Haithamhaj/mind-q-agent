@@ -22,3 +22,9 @@ ruff>=0.1.9
 # AI Assistant (Optional)
 aider-chat>=0.30.0
 PyMuPDF==1.25.1
+
+# API Server
+fastapi>=0.109.0
+uvicorn>=0.27.0
+python-multipart>=0.0.9
+pydantic-settings>=2.0.0
