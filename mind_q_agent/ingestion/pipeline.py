@@ -165,7 +165,15 @@ class IngestionPipeline:
                 OPTIONAL MATCH (a)-[r:RELATED_TO]->(b)
                 WITH a, b, r
                 WHERE r IS NULL
-                CREATE (a)-[:RELATED_TO {weight: 1.0, last_updated: $now_ts}]->(b)
+                CREATE (a)-[:RELATED_TO {
+                    base_weight: 1.0, 
+                    current_weight: 1.0,
+                    sample_size: 1,
+                    confidence: 0.5,
+                    observation_variance: 0.0,
+                    last_accessed: datetime($now_ts),
+                    decay_rate: 0.01
+                }]->(b)
             """
             
             # Use 'create if not exists' logic logic via MERGE if Kuzu fully supports it,
