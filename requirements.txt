@@ -1,0 +1,23 @@
+# Core Database Dependencies
+kuzu>=0.0.10
+chromadb>=0.4.22
+
+# NLP & Embeddings
+sentence-transformers>=2.2.2
+spacy>=3.7.2
+
+# File System Monitoring
+watchdog>=3.0.0
+
+# System & Utilities
+psutil>=5.9.6
+pyyaml>=6.0.1
+
+# Development & Testing
+pytest>=7.4.3
+pytest-cov>=4.1.0
+black>=23.12.1
+ruff>=0.1.9
+
+# AI Assistant (Optional)
+aider-chat>=0.30.0
