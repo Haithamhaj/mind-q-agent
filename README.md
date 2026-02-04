@@ -10,100 +10,56 @@
 
 ## ✨ Features
 
-- 📁 **File Watching** — Automatically ingests new documents
-- 🕸️ **Knowledge Graph** — Builds semantic relationships using KùzuDB
-- 🔍 **Vector Search** — Semantic similarity search via ChromaDB
-- 🧬 **Hebbian Learning** — Connections strengthen with use
-- 🌐 **Web Discovery** — Crawl and ingest web content
-- 📊 **Confidence Scoring** — Multi-factor knowledge reliability
+- **📁 Smart Ingestion** — Auto-processes PDF, Markdown, and Text files.
+- **🕸️ Knowledge Graph** — Semantic relationships powered by KùzuDB.
+- **🔍 Hybrid Search** — Combined Vector (ChromaDB) + Graph Search.
+- **⚡ Real-Time API** — WebSocket event streaming for UI/n8n.
+- **🧠 Hebbian Learning** — Connections strengthen with usage.
+- **📊 Analytics** — Built-in graph statistics and visualization endpoints.
+- **🔗 n8n Ready** — Auto-generated OpenAPI spec for Low-Code integration.
 
 ---
 
 ## 🏗️ Architecture
 
-```
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│ File Watcher│───▶│  Ingestion  │───▶│  Extraction │
-└─────────────┘    │  Pipeline   │    │  (NLP)      │
-                   └─────────────┘    └──────┬──────┘
-                                             │
-              ┌──────────────────────────────┼──────────────────────────┐
-              ▼                              ▼                          ▼
-        ┌──────────┐                  ┌──────────┐               ┌──────────┐
-        │ KùzuDB   │◀═══════════════▶│ ChromaDB │               │ SQLite   │
-        │ (Graph)  │                  │ (Vector) │               │ (Events) │
-        └──────────┘                  └──────────┘               └──────────┘
-              │                              │                          │
-              └──────────────────────────────┼──────────────────────────┘
-                                             ▼
-                                    ┌─────────────────┐
-                                    │  Search Engine  │
-                                    └─────────────────┘
-                                             │
-                                             ▼
-                                    ┌─────────────────┐
-                                    │ Learning System │
-                                    │ (Hebbian/Decay) │
-                                    └─────────────────┘
-```
-
----
-
-## 📁 Project Structure
-
-```
-mind-q-agent/
-├── mind_q_agent/               # Main source code
-│   ├── config/                 # Configuration manager
-│   ├── discovery/              # Web crawling & discovery
-│   │   ├── fetcher.py          # Async HTTP client
-│   │   ├── parser.py           # HTML content extraction
-│   │   └── engine.py           # Discovery loop
-│   ├── extraction/             # NLP & entity extraction
-│   ├── graph/                  # KùzuDB interface
-│   ├── ingestion/              # Document processing pipeline
-│   ├── learning/               # Hebbian learning components
-│   │   ├── tracker.py          # Interaction logging
-│   │   ├── hebbian_math.py     # Weight calculations
-│   │   ├── decay_math.py       # Temporal decay
-│   │   ├── pruning.py          # Graph pruning
-│   │   ├── scheduler.py        # Maintenance jobs
-│   │   ├── confidence.py       # Confidence scoring
-│   │   ├── hierarchy.py        # Concept classification
-│   │   ├── cluster.py          # Community detection
-│   │   └── authority.py        # Source authority
-│   ├── search/                 # Search engine
-│   ├── vector/                 # ChromaDB interface
-│   ├── watcher/                # File system monitoring
-│   ├── utils/                  # Helpers & logging
-│   └── cli.py                  # CLI implementation
-├── tests/                      # Test suite
-│   ├── unit/                   # Unit tests (20+ files)
-│   ├── integration/            # Integration tests
-│   └── e2e/                    # End-to-end tests
-├── config/
-│   └── default.yaml            # Default configuration
-├── scripts/
-│   ├── init_db.py              # Database initialization
-│   └── generate_status_report.py
-├── main.py                     # Entry point
-├── requirements.txt            # Dependencies
-└── README.md                   # This file
+```mermaid
+graph TD
+    User[Client / UI / n8n] -->|HTPP/WS| API[FastAPI Layer]
+    API --> Ingest[Ingestion Pipeline]
+    API --> Search[Search Engine]
+    API --> GraphControl[Graph Controller]
+    
+    Ingest -->|Parse| Parser[File Parser]
+    Parser -->|Extract| NLP[Entity Extractor]
+    NLP -->|Store| Kuzu[(KùzuDB Graph)]
+    NLP -->|Embed| Chroma[(ChromaDB Vectors)]
+    
+    Search -->|Query| Chroma
+    Search -->|Context| Kuzu
+    
+    GraphControl -->|Boost/Mute| Kuzu
+    
+    subgraph Data Layer
+        Kuzu
+        Chroma
+        SQLite[(Preferences)]
+    end
 ```
 
 ---
 
 ## 🚀 Quick Start
 
-### 1. Clone & Setup
+### 1. Setup
 
 ```bash
+# Clone repository
 git clone https://github.com/yourusername/mind-q-agent.git
 cd mind-q-agent
 
 # Create virtual environment
 python3 -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+source venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
@@ -112,61 +68,45 @@ pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 ```
 
-### 2. Initialize Databases
+### 2. Run the API Server
+
+The core of Mind-Q is now exposed via a FastAPI server.
 
 ```bash
-python scripts/init_db.py
+# Start server (default port 8000)
+uvicorn mind_q_agent.api.app:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-### 3. Run the CLI
+### 3. API Documentation
 
-```bash
-# Show help
-python main.py --help
-
-# Search for knowledge
-python main.py search "machine learning neural networks"
-
-# Ingest a file
-python main.py ingest /path/to/document.pdf
-```
+Once the server is running, visit:
+- **Swagger UI**: `http://localhost:8000/docs`
+- **ReDoc**: `http://localhost:8000/redoc`
+- **OpenAPI Spec**: `http://localhost:8000/api/v1/openapi.json`
 
 ---
 
-## 🧪 Testing
+## 📡 Key API Endpoints
 
-```bash
-# Run all tests
-pytest tests/ -v
+### 📄 Documents
+- `POST /api/v1/documents/upload` - Upload and ingest files (PDF, MD, TXT).
+- `GET /api/v1/documents` - List all ingested documents.
 
-# Run with coverage
-pytest tests/ --cov=mind_q_agent --cov-report=html
+### 🔍 Search
+- `GET /api/v1/search?q=query` - Semantic search with ranked results.
 
-# Run specific test module
-pytest tests/unit/test_hebbian_math.py -v
-```
+### 📊 Graph & Analytics
+- `GET /api/v1/graph/stats` - Node/Edge counts.
+- `GET /api/v1/graph/analytics` - Detailed system stats (top concepts, etc.).
+- `GET /api/v1/graph/visualize` - Cytoscape JSON for visualization.
 
----
+### ⚡ Real-Time
+- `WS /api/v1/ws/events` - Stream ingestion events (`ingestion_started`, etc.).
 
-## ⚙️ Configuration
-
-Edit `config/default.yaml`:
-
-```yaml
-db:
-  graph_path: ./data/graph
-  vector_path: ./data/vectors
-  interactions_path: ./data/interactions.db
-
-learning:
-  hebbian_alpha: 0.1
-  decay_rate: 0.01
-  prune_threshold: 0.1
-
-discovery:
-  max_pages: 10
-  timeout: 10.0
-```
+### ⚙️ System
+- `GET /api/v1/preferences` - Get user settings.
+- `GET /api/v1/system/backup` - Download full system backup (zip).
+- `POST /api/v1/system/restore` - Restore system from backup.
 
 ---
 
@@ -174,64 +114,24 @@ discovery:
 
 | Phase | Description | Status |
 |-------|-------------|--------|
-| **Phase 0** | Foundation (DB interfaces, config, logging) | ✅ 100% |
-| **Phase 1** | MVP Core (Ingestion, search, CLI) | ✅ 100% |
-| **Phase 2** | Learning (Hebbian, decay, pruning) | ✅ 100% |
-| **Phase 3** | Enhancements (Discovery, confidence, clustering) | ✅ 100% |
-
-**Total Progress: 40/40 tasks (100%)**
+| **Phase 0** | Foundation (DB interfaces, config) | ✅ Complete |
+| **Phase 1** | Core Ingestion & CLI | ✅ Complete |
+| **Phase 2** | Learning & Graph Logic | ✅ Complete |
+| **Phase 3** | Discovery Components | ✅ Complete |
+| **Phase 4A** | **API Layer & System Integration** | ✅ **COMPLETE** |
+| **Phase 4B** | LLM Integration | ⏳ Pending |
 
 ---
 
 ## 🔧 Tech Stack
 
-| Component | Technology |
-|-----------|------------|
-| Language | Python 3.10+ |
-| Graph DB | KùzuDB |
-| Vector DB | ChromaDB |
-| NLP | spaCy + sentence-transformers |
-| File Watching | watchdog |
-| PDF Parsing | PyMuPDF |
-| Testing | pytest |
-
----
-
-## 📚 Key Concepts
-
-### Hebbian Learning
-> "Neurons that fire together, wire together"
-
-When you search for concepts and click on results, the connections between those concepts strengthen over time.
-
-### Temporal Decay
-Unused connections gradually weaken, ensuring the knowledge graph stays relevant.
-
-### Confidence Scoring
-Each fact's confidence is calculated from:
-- Edge weight (co-occurrence frequency)
-- Source authority (trustworthiness)
-- Recency (when last updated)
-- Corroboration (multiple sources)
-
----
-
-## 🤝 Contributing
-
-Contributions welcome! Please:
-1. Fork the repository
-2. Create a feature branch
-3. Add tests for new functionality
-4. Submit a pull request
+- **Core**: Python 3.11+, FastAPI
+- **Data**: KùzuDB (Graph), ChromaDB (Vector), SQLite (Prefs)
+- **AI/NLP**: spaCy, sentence-transformers
+- **Integration**: WebSockets, OpenAPI (n8n compatible)
 
 ---
 
 ## 📄 License
 
 MIT License - see [LICENSE](LICENSE) for details.
-
----
-
-<p align="center">
-  <b>Built with ❤️ for personal knowledge management</b>
-</p>
