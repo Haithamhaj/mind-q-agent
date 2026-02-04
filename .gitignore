@@ -49,3 +49,9 @@ data/outputs/*
 # OS
 .DS_Store
 Thumbs.db
+
+# Project-specific
+mind_q.log
+STATUS_REPORT.txt
+project_status.txt
+logs/
