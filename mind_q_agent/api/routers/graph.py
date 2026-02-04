@@ -19,6 +19,32 @@ except Exception as e:
     logger.error(f"Failed to initialize Graph DB: {e}")
     graph_db = None
 
+@router.get("/analytics")
+def get_analytics():
+    """
+    Get detailed breakdown of system statistics.
+    """
+    if not graph_db:
+        raise HTTPException(status_code=500, detail="Graph DB not initialized")
+    
+    try:
+        node_count = graph_db.get_node_count()
+        edge_count = graph_db.get_edge_count()
+        top_concepts = graph_db.get_top_concepts(limit=10)
+        recent_docs = graph_db.get_recent_documents(limit=5)
+        
+        return {
+            "summary": {
+                "total_nodes": node_count,
+                "total_edges": edge_count,
+            },
+            "top_concepts": top_concepts,
+            "recent_documents": recent_docs
+        }
+    except Exception as e:
+        logger.error(f"Analytics failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.get("/stats")
 def get_graph_stats():
     """

@@ -329,3 +329,79 @@ class KuzuGraphDB:
             
         except Exception as e:
             logger.warning(f"Error during connection closure: {e}")
+
+    def boost_concept(self, name: str, amount: int = 1) -> None:
+        """
+        Boost a concept's importance (frequency).
+        """
+        try:
+            query = """
+                MATCH (c:Concept {name: $name})
+                SET c.global_frequency = c.global_frequency + $amount
+                RETURN c
+            """
+            self.conn.execute(query, {"name": name, "amount": amount})
+            logger.info(f"Boosted concept {name} by {amount}")
+        except Exception as e:
+            logger.error(f"Failed to boost concept {name}: {e}")
+            raise
+
+    def mute_concept(self, name: str) -> None:
+        """
+        Mute a concept (set is_ignored to true).
+        Note: Requires 'is_ignored' property on Concept table. 
+        We attempt to add it if missing dynamically or just handle if exists.
+        For now, we assume schema update handled or we fail gracefully.
+        """
+        try:
+            # Try to add property if not exists (Lazy migration for dev)
+            # In Kuzu, ALTER TABLE ADD PROPERTY ...
+            try:
+                self.conn.execute("ALTER TABLE Concept ADD is_ignored BOOLEAN DEFAULT false")
+            except Exception:
+                pass # Assume exists or error
+
+            query = """
+                MATCH (c:Concept {name: $name})
+                SET c.is_ignored = true
+                RETURN c
+            """
+            self.conn.execute(query, {"name": name})
+            logger.info(f"Muted concept {name}")
+        except Exception as e:
+            logger.error(f"Failed to mute concept {name}: {e}")
+            raise
+
+    def get_top_concepts(self, limit: int = 10) -> List[Dict[str, Any]]:
+        """
+        Get top concepts by global frequency.
+        """
+        try:
+            query = """
+                MATCH (c:Concept)
+                RETURN c.name as name, c.global_frequency as frequency, c.category as category
+                ORDER BY c.global_frequency DESC
+                LIMIT $limit
+            """
+            result = self.conn.execute(query, {'limit': limit})
+            return result.get_as_df().to_dict('records')
+        except Exception as e:
+            logger.error(f"Failed to get top concepts: {e}")
+            return []
+
+    def get_recent_documents(self, limit: int = 5) -> List[Dict[str, Any]]:
+        """
+        Get most recently created documents.
+        """
+        try:
+            query = """
+                MATCH (d:Document)
+                RETURN d.title as title, d.created_at as created_at, d.size_bytes as size
+                ORDER BY d.created_at DESC
+                LIMIT $limit
+            """
+            result = self.conn.execute(query, {'limit': limit})
+            return result.get_as_df().to_dict('records')
+        except Exception as e:
+            logger.error(f"Failed to get recent documents: {e}")
+            return []

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from mind_q_agent.api.settings import settings
-from mind_q_agent.api.routers import documents, search, graph, realtime, preferences
+from mind_q_agent.api.routers import documents, search, graph, realtime, preferences, concepts, system
 
 def create_app() -> FastAPI:
     app = FastAPI(
@@ -24,6 +24,8 @@ def create_app() -> FastAPI:
     app.include_router(graph.router, prefix=settings.API_prefix)
     app.include_router(realtime.router, prefix=settings.API_prefix)
     app.include_router(preferences.router, prefix=settings.API_prefix)
+    app.include_router(concepts.router, prefix=settings.API_prefix)
+    app.include_router(system.router, prefix=settings.API_prefix)
 
     @app.get("/health")
     async def health_check():
