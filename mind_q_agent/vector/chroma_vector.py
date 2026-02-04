@@ -189,3 +189,17 @@ class ChromaVectorDB:
             logger.error(f"Failed to generate embedding: {e}")
             raise RuntimeError(f"Embedding generation failed: {e}") from e
 
+    def delete_collection(self) -> None:
+        """
+        Delete the current collection from ChromaDB.
+        
+        This is useful for cleanup during testing or resetting the database.
+        """
+        try:
+            collection_name = self.collection.name
+            self.client.delete_collection(collection_name)
+            logger.info(f"Deleted collection: {collection_name}")
+        except Exception as e:
+            logger.error(f"Failed to delete collection: {e}")
+            raise RuntimeError(f"Failed to delete collection: {e}") from e
+

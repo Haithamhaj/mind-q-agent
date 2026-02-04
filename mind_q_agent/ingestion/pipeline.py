@@ -112,13 +112,14 @@ class IngestionPipeline:
 
     def _create_document_node(self, path: Path, file_hash: str, size: int):
         """Create the Document node in KuzuDB."""
+        from datetime import datetime
         query = """
             CREATE (d:Document {
                 hash: $hash,
                 title: $filename,
                 source_path: $path,
                 source_type: $ext,
-                created_at: timestamp(),
+                created_at: $created_at,
                 size_bytes: $size
             })
         """
@@ -127,6 +128,7 @@ class IngestionPipeline:
             'filename': path.name,
             'path': str(path),
             'ext': path.suffix,
+            'created_at': datetime.now().isoformat(),
             'size': size
         }
         self.graph_db.execute(query, params)
@@ -157,12 +159,13 @@ class IngestionPipeline:
             # Kuzu's RELATED_TO is likely directed in schema, but semantically symmetric here.
             # We'll create one direction for minimal redundancy, or based on lexicographical order.
             
+            from datetime import datetime
             query = """
                 MATCH (a:Concept {name: $c1}), (b:Concept {name: $c2})
                 OPTIONAL MATCH (a)-[r:RELATED_TO]->(b)
                 WITH a, b, r
                 WHERE r IS NULL
-                CREATE (a)-[:RELATED_TO {weight: 1.0, last_updated: timestamp()}]->(b)
+                CREATE (a)-[:RELATED_TO {weight: 1.0, last_updated: $now_ts}]->(b)
             """
             
             # Use 'create if not exists' logic logic via MERGE if Kuzu fully supports it,
@@ -171,6 +174,6 @@ class IngestionPipeline:
             # Let's use the query above.
             
             try:
-                self.graph_db.execute(query, {'c1': c1, 'c2': c2})
+                self.graph_db.execute(query, {'c1': c1, 'c2': c2, 'now_ts': datetime.now().isoformat()})
             except Exception as e:
                 logger.warning(f"Failed to link concepts {c1}-{c2}: {e}")

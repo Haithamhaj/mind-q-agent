@@ -68,7 +68,7 @@ class KuzuGraphDB:
                 CREATE NODE TABLE IF NOT EXISTS User(
                     id STRING,
                     name STRING,
-                    created_at TIMESTAMP,
+                    created_at STRING,
                     PRIMARY KEY (id)
                 )
             """)
@@ -80,7 +80,7 @@ class KuzuGraphDB:
                     title STRING,
                     source_path STRING,
                     source_type STRING,
-                    created_at TIMESTAMP,
+                    created_at STRING,
                     size_bytes INT64,
                     PRIMARY KEY (hash)
                 )
@@ -94,7 +94,7 @@ class KuzuGraphDB:
                     embedding DOUBLE[384],
                     global_frequency INT64,
                     is_broad BOOLEAN,
-                    first_seen TIMESTAMP,
+                    first_seen STRING,
                     PRIMARY KEY (name)
                 )
             """)

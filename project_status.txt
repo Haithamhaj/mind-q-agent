@@ -1,0 +1,91 @@
+=== PROJECT STRUCTURE ===
+
+=== FILES IN mind_q_agent/ ===
+mind_q_agent/__init__.py
+mind_q_agent/cli.py
+mind_q_agent/config/manager.py
+mind_q_agent/discovery/__init__.py
+mind_q_agent/extraction/__init__.py
+mind_q_agent/extraction/entity_extractor.py
+mind_q_agent/graph/__init__.py
+mind_q_agent/graph/kuzu_graph.py
+mind_q_agent/ingestion/pipeline.py
+mind_q_agent/ingestion/worker.py
+mind_q_agent/learning/__init__.py
+mind_q_agent/learning/decay_job.py
+mind_q_agent/learning/decay_math.py
+mind_q_agent/learning/hebbian_math.py
+mind_q_agent/learning/prune_job.py
+mind_q_agent/learning/pruning.py
+mind_q_agent/learning/scheduler.py
+mind_q_agent/learning/tracker.py
+mind_q_agent/learning/updater.py
+mind_q_agent/query/__init__.py
+mind_q_agent/search/engine.py
+mind_q_agent/utils/__init__.py
+mind_q_agent/utils/decorator.py
+mind_q_agent/utils/errors.py
+mind_q_agent/utils/logger.py
+mind_q_agent/vector/__init__.py
+mind_q_agent/vector/chroma_vector.py
+mind_q_agent/watcher/__init__.py
+mind_q_agent/watcher/file_watcher.py
+
+=== TEST FILES ===
+tests/__init__.py
+tests/integration/test_phase0.py
+tests/unit/test_chroma_vector.py
+tests/unit/test_config.py
+tests/unit/test_decay_job.py
+tests/unit/test_decay_math.py
+tests/unit/test_entity_extractor.py
+tests/unit/test_errors.py
+tests/unit/test_file_watcher.py
+tests/unit/test_hebbian_math.py
+tests/unit/test_ingestion_logic.py
+tests/unit/test_kuzu_graph.py
+tests/unit/test_prune_job.py
+tests/unit/test_pruning.py
+tests/unit/test_scheduler.py
+tests/unit/test_search_engine.py
+tests/unit/test_tracker.py
+tests/unit/test_updater.py
+tests/unit/test_worker.py
+
+=== LAST 10 COMMITS ===
+19673e2 feat: Implement a maintenance scheduler with jobs for temporal edge weight decay and pruning.
+0271fcd feat: Implement Hebbian learning and temporal decay for adaptive graph edge weights.
+4814a31 feat: Implement initial core infrastructure for the Mind-Q agent, including ingestion, search, configuration, and data management.
+224aaa4 Task 0.4: Implement FileWatcher with watchdog and PyMuPDF
+2b9d260 Task 0.2: Complete ChromaDB vector interface with semantic search
+be734a2 Task 0.1: Complete KùzuDB graph interface with 17 passing tests
+91fcde4 Initial setup: project structure + dependencies
+
+=== TEST RESULTS ===
+zsh: command not found: pytest
+
+=== REQUIREMENTS ===
+# Core Database Dependencies
+kuzu>=0.0.10
+chromadb>=0.4.22
+
+# NLP & Embeddings
+sentence-transformers>=2.2.2
+spacy>=3.7.2
+
+# File System Monitoring
+watchdog>=3.0.0
+
+# System & Utilities
+psutil>=5.9.6
+pyyaml>=6.0.1
+
+# Development & Testing
+pytest>=7.4.3
+pytest-cov>=4.1.0
+black>=23.12.1
+ruff>=0.1.9
+
+# AI Assistant (Optional)
+aider-chat>=0.30.0
+PyMuPDF==1.25.1

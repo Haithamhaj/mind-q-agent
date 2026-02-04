@@ -65,9 +65,13 @@ class DecayJob:
                     update_query = """
                         MATCH ()-[r:RELATED_TO]->()
                         WHERE id(r) = $edge_id
-                        SET r.weight = $new_weight, r.last_updated = timestamp()
+                        SET r.weight = $new_weight, r.last_updated = $now_ts
                     """
-                    self.graph_db.execute(update_query, {"edge_id": edge_id, "new_weight": new_weight})
+                    self.graph_db.execute(update_query, {
+                        "edge_id": edge_id, 
+                        "new_weight": new_weight,
+                        "now_ts": datetime.now().isoformat()
+                    })
                     updated_count += 1
                     logger.debug(f"Decayed edge {edge_id}: {current_weight:.3f} -> {new_weight:.3f}")
                 except Exception as e:
