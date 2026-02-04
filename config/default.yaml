@@ -13,6 +13,7 @@ ingestion:
 learning:
   alpha: 0.1  # Learning rate
   decay_rate: 0.05
+  prune_threshold: 0.1  # Edges below this weight will be deleted
   event_scores:
     CLICK: 1.0
     SEARCH: 0.5
