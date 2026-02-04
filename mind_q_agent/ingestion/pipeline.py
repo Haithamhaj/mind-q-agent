@@ -171,7 +171,7 @@ class IngestionPipeline:
                     sample_size: 1,
                     confidence: 0.5,
                     observation_variance: 0.0,
-                    last_accessed: datetime($now_ts),
+                    last_accessed: $now_ts,
                     decay_rate: 0.01
                 }]->(b)
             """

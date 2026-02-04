@@ -5,7 +5,7 @@ import os
 import time
 
 # Config
-PORT = 8772
+PORT = 8773
 BASE_URL = f"http://127.0.0.1:{PORT}/api/v1"
 TEST_FILE_CONTENT = "Mind-Q Verification: Artificial Intelligence and Agents working together."
 TEST_FILENAME = "verify_phase4a.txt"
@@ -88,6 +88,35 @@ def run_tests():
             # return False # Soft fail?
     except Exception as e:
         print(f"[FAIL] Search: {e}")
+        return False
+
+    # 5. Graph Stats
+    try:
+        r = requests.get(f"{BASE_URL}/graph/stats")
+        assert r.status_code == 200
+        stats = r.json()
+        print(f"[INFO] Graph Stats: {stats}")
+        if stats.get("nodes", 0) > 0:
+            print("[PASS] Graph Stats (nodes > 0)")
+        else:
+             print("[WARN] Graph Stats: 0 nodes (might be clean DB)")
+    except Exception as e:
+        print(f"[FAIL] Graph Stats: {e}")
+        return False
+
+    # 6. Graph Visualize
+    try:
+        r = requests.get(f"{BASE_URL}/graph/visualize?limit=10")
+        assert r.status_code == 200
+        elements = r.json()
+        print(f"[INFO] Graph Viz Elements: {len(elements)}")
+        # Check structure
+        if len(elements) > 0 and "data" in elements[0]:
+             print("[PASS] Graph Visualization")
+        else:
+             print("[WARN] Graph Visualization: No elements or invalid format")
+    except Exception as e:
+        print(f"[FAIL] Graph Viz: {e}")
         return False
 
     return True
