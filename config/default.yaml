@@ -1,0 +1,12 @@
+db:
+  graph_path: "./data/mindq_graph"
+  vector_path: "./data/vector_store"
+watcher:
+  watch_dir: "./data/docs"
+  debounce_seconds: 1.0
+logging:
+  level: "INFO"
+  file_path: "./logs/mindq.log"
+ingestion:
+  cooccurrence_window: 100
+  chunk_size: 1000

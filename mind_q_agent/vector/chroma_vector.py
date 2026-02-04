@@ -172,13 +172,20 @@ class ChromaVectorDB:
         """
         return self.collection.count()
 
-    def delete_collection(self) -> None:
+    def get_embedding(self, text: str) -> List[float]:
         """
-        Delete the collection. Useful for cleanup or testing.
+        Generate embedding for a single text string.
+        
+        Args:
+            text: Input text
+            
+        Returns:
+            Embedding vector as list of floats
         """
         try:
-            self.client.delete_collection(self.collection.name)
-            logger.info(f"Deleted collection: {self.collection.name}")
+            embedding = self.model.encode([text])[0].tolist()
+            return embedding
         except Exception as e:
-            logger.error(f"Failed to delete collection: {e}")
-            raise RuntimeError(f"Failed to delete collection: {e}") from e
+            logger.error(f"Failed to generate embedding: {e}")
+            raise RuntimeError(f"Embedding generation failed: {e}") from e
+
