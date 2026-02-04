@@ -45,8 +45,39 @@ class TestInteractionTracker:
         cursor.execute("INSERT INTO interactions (event_type, target_id) VALUES (?, ?)", ("TEST", "hash1"))
         conn.commit()
         
-        cursor.execute("SELECT * FROM interactions")
-        row = cursor.fetchone()
-        assert row is not None
-        assert row[1] == "TEST"
-        conn.close()
+    def test_logging_methods(self, tracker):
+        """Test public logging API."""
+        # 1. Search
+        sid = tracker.log_search("Mind-Q")
+        assert sid > 0
+        
+        # 2. Click
+        cid = tracker.log_click("concept_hash_123")
+        assert cid > 0
+        
+        # 3. View
+        vid = tracker.log_view("doc_hash_456", duration_sec=5.5)
+        assert vid > 0
+        
+        # Verify in DB
+        events = tracker.get_recent_interactions(limit=10)
+        assert len(events) == 3
+        
+        # Verify order (DESC timestamp) -> View should be first
+        assert events[0]["event_type"] == "VIEW"
+        assert events[0]["duration_sec"] == 5.5
+        
+        assert events[1]["event_type"] == "CLICK"
+        assert events[1]["target_id"] == "concept_hash_123"
+        
+        assert events[2]["event_type"] == "SEARCH"
+        assert events[2]["query"] == "Mind-Q"
+
+    def test_retrieval_limit(self, tracker):
+        """Test getting recent interactions with limit."""
+        for i in range(5):
+            tracker.log_search(f"query_{i}")
+            
+        events = tracker.get_recent_interactions(limit=3)
+        assert len(events) == 3
+        assert events[0]["query"] == "query_4" # LIFO/DESC

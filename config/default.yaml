@@ -10,3 +10,11 @@ logging:
 ingestion:
   cooccurrence_window: 100
   chunk_size: 1000
+learning:
+  alpha: 0.1  # Learning rate
+  decay_rate: 0.05
+  event_scores:
+    CLICK: 1.0
+    SEARCH: 0.5
+    VIEW_BASE: 0.3
+    VIEW_MAX: 1.0
