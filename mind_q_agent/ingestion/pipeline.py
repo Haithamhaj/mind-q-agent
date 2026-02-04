@@ -6,6 +6,7 @@ from typing import List, Optional
 from mind_q_agent.graph.kuzu_graph import KuzuGraphDB
 from mind_q_agent.vector.chroma_vector import ChromaVectorDB
 from mind_q_agent.extraction.entity_extractor import EntityExtractor
+from mind_q_agent.events.bus import event_bus
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +21,7 @@ class IngestionPipeline:
         self.vector_store = vector_store
         self.extractor = EntityExtractor()
 
-    def process_document(self, file_path: Path, text: str) -> bool:
+    async def process_document(self, file_path: Path, text: str) -> bool:
         """
         Process a single document.
         
@@ -34,6 +35,8 @@ class IngestionPipeline:
         try:
             # 1. Generate file hash (SHA256)
             file_hash = self._calculate_hash(text)
+            
+            await event_bus.emit("ingestion_started", {"filename": file_path.name, "hash": file_hash})
             
             # 2. Check Graph for existing Document node (deduplication)
             if self._document_exists(file_hash):
@@ -78,10 +81,12 @@ class IngestionPipeline:
             self._create_concept_edges(all_concept_names)
 
             logger.info(f"Successfully processed {file_path.name}")
+            await event_bus.emit("ingestion_completed", {"filename": file_path.name, "hash": file_hash})
             return True
             
         except Exception as e:
             logger.error(f"Failed to process {file_path.name}: {e}")
+            await event_bus.emit("ingestion_failed", {"filename": file_path.name, "error": str(e)})
             raise e
 
     def _process_concept(self, doc_hash: str, name: str, category: str):

@@ -59,9 +59,9 @@ async def upload_document(
             await file.seek(0)
             shutil.copyfileobj(file.file, f)
             
-        # 3. Trigger Ingestion (Synchronous for now to return result, could be background)
+        # 3. Trigger Ingestion
         # We'll do it synchronously to give immediate feedback for this phase
-        success = pipeline.process_document(file_path.absolute(), text)
+        success = await pipeline.process_document(file_path.absolute(), text)
         
         if not success:
              return {"message": "Document already exists (deduplicated)", "filename": file.filename}
