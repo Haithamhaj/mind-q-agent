@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import CytoscapeComponent from 'react-cytoscapejs';
 import cytoscape from 'cytoscape';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Network, Share2, Database, Loader2, RefreshCw, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
+import { Network, Share2, Database, Loader2, RefreshCw, ZoomIn, ZoomOut, Maximize, X, FileText, Lightbulb } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 
 interface GraphStats {
@@ -21,12 +21,20 @@ interface CyElement {
     };
 }
 
+interface SelectedNode {
+    id: string;
+    label: string;
+    type: string;
+    connections: number;
+}
+
 const GraphPage: React.FC = () => {
     const [stats, setStats] = useState<GraphStats | null>(null);
     const [elements, setElements] = useState<CyElement[]>([]);
     const [loading, setLoading] = useState(true);
     const [graphLoading, setGraphLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [selectedNode, setSelectedNode] = useState<SelectedNode | null>(null);
     const cyRef = useRef<cytoscape.Core | null>(null);
 
     const fetchStats = async () => {
@@ -67,6 +75,39 @@ const GraphPage: React.FC = () => {
         fetchGraphData();
     }, []);
 
+    // Setup click handler when cytoscape is ready
+    useEffect(() => {
+        const cy = cyRef.current;
+        if (!cy) return;
+
+        // Cleanup previous listeners to avoid duplicates
+        cy.off('tap');
+
+        // Add new listeners
+        cy.on('tap', 'node', (evt) => {
+            console.log('Node clicked:', evt.target.data());
+            const node = evt.target;
+            const connectedEdges = node.connectedEdges().length;
+
+            // Force state update safely
+            setSelectedNode({
+                id: node.data('id'),
+                label: node.data('label'),
+                type: node.data('type'),
+                connections: connectedEdges
+            });
+        });
+
+        // Click on background to close modal
+        cy.on('tap', (evt) => {
+            if (evt.target === cy) {
+                console.log('Background clicked');
+                setSelectedNode(null);
+            }
+        });
+
+    }, [elements, graphLoading]); // Re-run when elements change
+
     const handleZoomIn = () => {
         if (cyRef.current) {
             cyRef.current.zoom(cyRef.current.zoom() * 1.2);
@@ -106,7 +147,8 @@ const GraphPage: React.FC = () => {
                 'height': 40,
                 'border-width': 3,
                 'border-color': '#1d4ed8',
-            },
+                'z-index': 10
+            } as any,
         },
         {
             selector: 'node[type="Concept"]',
@@ -122,7 +164,8 @@ const GraphPage: React.FC = () => {
                 'height': 30,
                 'border-width': 2,
                 'border-color': '#7c3aed',
-            },
+                'z-index': 10
+            } as any,
         },
         {
             selector: 'edge',
@@ -133,7 +176,8 @@ const GraphPage: React.FC = () => {
                 'target-arrow-shape': 'triangle',
                 'curve-style': 'bezier',
                 'opacity': 0.7,
-            },
+                'z-index': 5
+            } as any,
         },
         {
             selector: 'node:selected',
@@ -145,7 +189,56 @@ const GraphPage: React.FC = () => {
     ];
 
     return (
-        <div className="p-8 max-w-6xl mx-auto">
+        <div className="p-8 max-w-6xl mx-auto relative">
+            {/* Node Details Modal - Now Fixed Positioned */}
+            {selectedNode && (
+                <div className="fixed bottom-8 right-8 z-[100] bg-white rounded-xl shadow-2xl border border-zinc-200 w-80 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200">
+                    <div className={`px-4 py-3 flex items-center justify-between ${selectedNode.type === 'Document' ? 'bg-blue-50' : 'bg-purple-50'}`}>
+                        <div className="flex items-center gap-2">
+                            {selectedNode.type === 'Document' ? (
+                                <FileText className="w-5 h-5 text-blue-600" />
+                            ) : (
+                                <Lightbulb className="w-5 h-5 text-purple-600" />
+                            )}
+                            <span className={`text-sm font-semibold ${selectedNode.type === 'Document' ? 'text-blue-900' : 'text-purple-900'}`}>
+                                {selectedNode.type} Details
+                            </span>
+                        </div>
+                        <button
+                            onClick={() => setSelectedNode(null)}
+                            className="text-zinc-400 hover:text-zinc-600 transition-colors p-1 rounded-full hover:bg-black/5"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                    </div>
+                    <div className="p-5">
+                        <h3 className="font-bold text-zinc-900 text-lg mb-4 break-words leading-tight">
+                            {selectedNode.label}
+                        </h3>
+                        <div className="space-y-3 text-sm">
+                            <div className="flex justify-between items-center py-2 border-b border-zinc-100">
+                                <span className="text-zinc-500">Connections</span>
+                                <span className="font-semibold text-zinc-900 bg-zinc-100 px-2 py-0.5 rounded-full text-xs">{selectedNode.connections} Edges</span>
+                            </div>
+                            <div className="flex justify-between items-center pt-1">
+                                <span className="text-zinc-500">Node Type</span>
+                                <span className={`font-medium px-2.5 py-1 rounded-full text-xs ${selectedNode.type === 'Document'
+                                        ? 'bg-blue-100 text-blue-700'
+                                        : 'bg-purple-100 text-purple-700'
+                                    }`}>
+                                    {selectedNode.type}
+                                </span>
+                            </div>
+                        </div>
+                        <div className="mt-5 pt-3 border-t border-zinc-100">
+                            <Button size="sm" variant="outline" className="w-full text-xs h-8" onClick={() => setSelectedNode(null)}>
+                                Close
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="flex justify-between items-center mb-8">
                 <div>
                     <h1 className="text-2xl font-bold text-zinc-900">Knowledge Graph</h1>
@@ -163,7 +256,9 @@ const GraphPage: React.FC = () => {
                 </div>
             )}
 
+            {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                {/* ... same stats code ... */}
                 <div className="bg-white p-6 rounded-xl border border-zinc-200 shadow-sm flex items-center">
                     <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
                         <Database className="w-6 h-6 text-purple-600" />
@@ -203,8 +298,9 @@ const GraphPage: React.FC = () => {
             <div className="bg-zinc-950 rounded-xl overflow-hidden shadow-lg h-[500px] mb-8 relative border border-zinc-800">
                 {/* Controls */}
                 <div className="absolute top-4 left-4 z-10 flex gap-2">
-                    <div className="bg-zinc-900/80 backdrop-blur px-3 py-1 rounded text-xs text-zinc-300 border border-zinc-700">
-                        Interactive View
+                    <div className="bg-zinc-900/80 backdrop-blur px-3 py-1 rounded text-xs text-zinc-300 border border-zinc-700 flex items-center">
+                        <Lightbulb className="w-3 h-3 mr-1.5 text-yellow-500" />
+                        Click any node to view details
                     </div>
                 </div>
                 <div className="absolute top-4 right-4 z-10 flex gap-2">
@@ -220,6 +316,7 @@ const GraphPage: React.FC = () => {
                 </div>
 
                 {/* Legend */}
+                {/* ... same legend code ... */}
                 <div className="absolute bottom-4 left-4 z-10 bg-zinc-900/80 backdrop-blur px-3 py-2 rounded text-xs border border-zinc-700 flex gap-4">
                     <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded-full bg-blue-500"></div>
@@ -243,7 +340,6 @@ const GraphPage: React.FC = () => {
                         <div className="text-center">
                             <Network className="w-16 h-16 text-zinc-700 mx-auto mb-4" />
                             <p className="text-zinc-500 text-sm">No graph data available</p>
-                            <p className="text-zinc-700 text-xs mt-1">Upload some documents to see connections</p>
                         </div>
                     </div>
                 ) : (
