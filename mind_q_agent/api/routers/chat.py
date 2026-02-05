@@ -4,7 +4,7 @@ from typing import Optional, List, Dict, AsyncGenerator
 from fastapi.responses import StreamingResponse
 
 import logging
-from mind_q_agent.rag.context import ContextBuilder
+from mind_q_agent.llm.processing import response_processor
 from mind_q_agent.llm.config import ModelConfig
 
 router = APIRouter(
@@ -68,8 +68,16 @@ class ChatService:
             if req.stream:
                 return provider.stream(req.message, system_prompt=system_prompt)
             else:
-                response_text = await provider.generate(req.message, system_prompt=system_prompt)
-                return ChatResponse(response=response_text)
+                raw_response = await provider.generate(req.message, system_prompt=system_prompt)
+                
+                # Process response for citations
+                final_text, sources = response_processor.extract_citations(raw_response)
+                
+                return ChatResponse(
+                    response=final_text,
+                    sources=sources,
+                    context_used=True if sources else False
+                )
         finally:
              if not req.stream:
                  await provider.close()
