@@ -27,15 +27,17 @@ def get_n8n_client():
 
 async def get_converter():
     # TODO: Replace with real LLM provider injection
-    from mind_q_agent.llm.provider import LLMProvider
-    # This is a temporary hack until LLM factory is standardized in the project
-    class MockLLM(LLMProvider):
-        async def generate(self, prompt, system_prompt=None):
-            return '{"template_id": "daily_digest", "parameters": {"email": "test@example.com"}}'
-        async def stream(self, prompt, system_prompt=None): yield ""
-        def get_provider_name(self): return "mock"
-        
-    llm = MockLLM() 
+    # Use real Ollama Provider (qwen2.5:3b)
+    from mind_q_agent.llm.config import ModelConfig
+    from mind_q_agent.llm.providers.ollama import OllamaProvider
+
+    config = ModelConfig(
+        provider="ollama",
+        model_name="qwen2.5:3b",
+        temperature=0.1 # Low temp for structured JSON
+    )
+    llm = OllamaProvider(config)
+    
     loader = TemplateLoader()
     return WorkflowConverter(llm, loader)
 
@@ -94,7 +96,7 @@ async def create_automation(
             "workflow_id": workflow_id,
             "name": n8n_wf['name'],
             "status": "created_and_activated",
-            "explanation": f"I've created a workflow based on template '{metadata['template_id']}'."
+            "explanation": f"I've created a workflow based on template '{metadata['template_id']}'. Please check the settings if you see any placeholders like 'INSERT_...'."
         }
         
     except Exception as e:

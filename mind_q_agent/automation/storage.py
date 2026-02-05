@@ -46,6 +46,8 @@ class AutomationStorage:
                 automation_id, user_id, workflow_id, workflow_name, 
                 description, json.dumps(metadata or {})
             ))
+            conn.commit()
+            logger.info(f"Stored automation {automation_id} for user {user_id}")
             
     def get_automation(self, automation_id: str) -> Optional[Dict]:
         """Get automation details"""

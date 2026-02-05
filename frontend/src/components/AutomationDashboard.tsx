@@ -35,7 +35,7 @@ const AutomationDashboard: React.FC = () => {
 
     const fetchDashboard = async () => {
         try {
-            const res = await fetch(`http://localhost:8000/api/v1/automation/monitoring/dashboard/${userId}`);
+            const res = await fetch(`/api/v1/automation/monitoring/dashboard/${userId}`);
             const json = await res.json();
             setData(json);
             setLoading(false);
@@ -50,7 +50,7 @@ const AutomationDashboard: React.FC = () => {
         setCreating(true);
         setCreateResult(null);
         try {
-            const res = await fetch('http://localhost:8000/api/v1/automation/create', {
+            const res = await fetch('/api/v1/automation/create', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ prompt, user_id: userId })
@@ -68,7 +68,7 @@ const AutomationDashboard: React.FC = () => {
 
     const toggleAutomation = async (id: string, currentActive: boolean) => {
         try {
-            await fetch(`http://localhost:8000/api/v1/automation/${id}/activate?active=${!currentActive}`, {
+            await fetch(`/api/v1/automation/${id}/activate?active=${!currentActive}`, {
                 method: 'POST'
             });
             fetchDashboard();
@@ -159,8 +159,8 @@ const AutomationDashboard: React.FC = () => {
                                         <button
                                             onClick={() => toggleAutomation(auto.id, auto.active)}
                                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${auto.active
-                                                    ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                                ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                                 }`}
                                         >
                                             {auto.active ? 'Active' : 'Paused'}

@@ -34,6 +34,10 @@ class WorkflowConverter:
         2. 'parameters': A dictionary of parameter values extracted from the request.
         3. 'reason': Brief explanation of why you chose this template.
         
+        If a required parameter (like email, url) is missing from the request, 
+        DO NOT hallucinate a specific value (like test@example.com). 
+        Instead, use a generic placeholder like "INSERT_EMAIL_HERE" or "INSERT_URL_HERE".
+        
         If no template matches, return 'template_id': null.
         only return valid JSON. provided strings should be properly escaped.
         """

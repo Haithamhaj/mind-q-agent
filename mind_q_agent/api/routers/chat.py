@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 # Request Model
 class ChatRequest(BaseModel):
     message: str
-    model: Optional[str] = "llama3" # Default model
+    model: Optional[str] = "qwen2.5:3b" # Default model
     provider: Optional[str] = "ollama"
     temperature: Optional[float] = 0.7
     stream: bool = False
@@ -90,7 +90,7 @@ except Exception as e:
     logger.error(f"Failed to init ChatService: {e}")
     chat_service = None
 
-@router.post("/", response_model=ChatResponse)
+@router.post("", response_model=ChatResponse)
 async def chat(req: ChatRequest):
     """
     Chat with Mind-Q (RAG enabled).

@@ -19,7 +19,7 @@ interface SearchResult {
   };
 }
 
-const API_BASE = 'http://localhost:8000/api/v1';
+const API_BASE = '/api/v1';
 
 type SearchSource = 'internal' | 'youtube' | 'arxiv';
 
@@ -137,8 +137,8 @@ const SearchPage: React.FC = () => {
               key={tab.id}
               onClick={() => setSource(tab.id as SearchSource)}
               className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${source === tab.id
-                  ? 'bg-white text-zinc-900 shadow-sm'
-                  : 'text-zinc-500 hover:text-zinc-700'
+                ? 'bg-white text-zinc-900 shadow-sm'
+                : 'text-zinc-500 hover:text-zinc-700'
                 }`}
             >
               <tab.icon className="w-4 h-4 mr-2" />

@@ -51,7 +51,7 @@ const ChatPage: React.FC = () => {
 
     try {
       // Direct fetch to support streaming
-      const response = await fetch('http://localhost:8000/api/v1/chat', {
+      const response = await fetch('/api/v1/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -64,7 +64,7 @@ const ChatPage: React.FC = () => {
       });
 
       if (!response.ok || !response.body) {
-         throw new Error('Network response was not ok');
+        throw new Error('Network response was not ok');
       }
 
       const reader = response.body.getReader();
@@ -76,7 +76,7 @@ const ChatPage: React.FC = () => {
         const { value, done: doneReading } = await reader.read();
         done = doneReading;
         const chunkValue = decoder.decode(value, { stream: !done });
-        
+
         // Simple parsing assumption: backend sends raw text chunks or json lines
         // If the backend sends SSE (Server Sent Events), this parsing logic needs to be adapted.
         // Assuming raw text stream or NDJSON for this demo as per "Streaming response handling"
@@ -148,28 +148,28 @@ const ChatPage: React.FC = () => {
                   <Bot className="w-5 h-5 text-indigo-600" />
                 </div>
               )}
-              
+
               <div className={cn(
                 "relative max-w-[80%] rounded-2xl px-5 py-3 text-sm leading-relaxed",
-                msg.role === 'user' 
-                  ? "bg-zinc-100 text-zinc-900 rounded-br-sm" 
+                msg.role === 'user'
+                  ? "bg-zinc-100 text-zinc-900 rounded-br-sm"
                   : "bg-white text-zinc-800 shadow-sm border border-zinc-100 rounded-bl-sm"
               )}>
                 {msg.role === 'user' ? (
                   <div className="whitespace-pre-wrap">{msg.content}</div>
                 ) : (
                   <div className="markdown-body">
-                    <ReactMarkdown 
+                    <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
                       components={{
-                        code({className, children, ...props}) {
-                           return (
-                             <code className={cn("bg-zinc-100 px-1 py-0.5 rounded text-zinc-800 font-mono text-xs", className)} {...props}>
-                               {children}
-                             </code>
-                           )
+                        code({ className, children, ...props }) {
+                          return (
+                            <code className={cn("bg-zinc-100 px-1 py-0.5 rounded text-zinc-800 font-mono text-xs", className)} {...props}>
+                              {children}
+                            </code>
+                          )
                         },
-                        pre({children}) {
+                        pre({ children }) {
                           return <pre className="bg-zinc-900 text-zinc-50 p-3 rounded-lg overflow-x-auto my-2 text-xs font-mono">{children}</pre>
                         }
                       }}
@@ -180,7 +180,7 @@ const ChatPage: React.FC = () => {
                 )}
               </div>
 
-               {msg.role === 'user' && (
+              {msg.role === 'user' && (
                 <div className="w-8 h-8 rounded-full bg-zinc-200 flex-shrink-0 flex items-center justify-center border border-zinc-300 mt-1">
                   <User className="w-5 h-5 text-zinc-600" />
                 </div>
@@ -203,29 +203,29 @@ const ChatPage: React.FC = () => {
               className="w-full min-h-[60px] max-h-[200px] p-4 pr-12 bg-transparent border-none resize-none focus:ring-0 text-zinc-800 placeholder:text-zinc-400"
               style={{ height: 'auto', overflow: 'hidden' }}
             />
-            
+
             <div className="flex items-center justify-between px-2 pb-2">
-                <div className="flex items-center">
-                    <Button type="button" variant="ghost" size="icon" className="text-zinc-400 hover:text-zinc-600">
-                        <Paperclip className="w-5 h-5" />
-                    </Button>
-                </div>
-                <div>
-                     {isLoading ? (
-                        <Button type="button" onClick={handleStop} variant="ghost" size="icon" className="text-red-500 hover:bg-red-50">
-                        <StopCircle className="w-6 h-6" />
-                        </Button>
-                    ) : (
-                        <Button type="submit" disabled={!input.trim()} size="icon" variant="primary" className="rounded-xl w-9 h-9">
-                        <Send className="w-4 h-4" />
-                        </Button>
-                    )}
-                </div>
+              <div className="flex items-center">
+                <Button type="button" variant="ghost" size="icon" className="text-zinc-400 hover:text-zinc-600">
+                  <Paperclip className="w-5 h-5" />
+                </Button>
+              </div>
+              <div>
+                {isLoading ? (
+                  <Button type="button" onClick={handleStop} variant="ghost" size="icon" className="text-red-500 hover:bg-red-50">
+                    <StopCircle className="w-6 h-6" />
+                  </Button>
+                ) : (
+                  <Button type="submit" disabled={!input.trim()} size="icon" variant="primary" className="rounded-xl w-9 h-9">
+                    <Send className="w-4 h-4" />
+                  </Button>
+                )}
+              </div>
             </div>
           </form>
         </div>
         <p className="text-center text-xs text-zinc-400 mt-3">
-            Mind-Q can make mistakes. Verify important information.
+          Mind-Q can make mistakes. Verify important information.
         </p>
       </div>
     </div>
