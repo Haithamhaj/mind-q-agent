@@ -49,8 +49,6 @@ async def ask_question(req: QARequest):
 
 @router.post("/tags/generate")
 async def generate_tags(req: TagRequest):
-async def generate_tags(req: TagRequest):
-async def generate_tags(req: TagRequest):
     """Auto-generate tags for text"""
     return await tagging_service.generate_tags(req.text)
 

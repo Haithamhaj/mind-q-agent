@@ -1,7 +1,6 @@
 import logging
 import random
 from typing import List, Dict, Any
-from mind_q_agent.learning.tracker import ConceptTracker
 from mind_q_agent.tools import YouTubeSearchTool, ArxivSearchTool
 
 logger = logging.getLogger(__name__)
@@ -13,7 +12,6 @@ class SuggestionService:
     """
     def __init__(self):
         # We would inject dependencies here in a real app
-        self.tracker = ConceptTracker() # Assuming this connects to DB
         self.youtube = YouTubeSearchTool()
         self.arxiv = ArxivSearchTool()
 
