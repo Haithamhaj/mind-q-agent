@@ -1,0 +1,5 @@
+{
+  "name": "Mind-Q",
+  "description": "A local-first intelligent knowledge agent with a clean, Google AI Studio-inspired interface.",
+  "requestFramePermissions": []
+}
