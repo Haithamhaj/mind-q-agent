@@ -97,3 +97,62 @@ The backend is running at `http://localhost:8000/api/v1`.
 6. Build the `DocumentUploader` component.
 
 **Start by scaffolding the project structure and the Main Layout.**
+
+---
+
+## 🏗️ Appendix: Data Models (TypeScript Interfaces)
+Use these exact types to ensure compatibility with the Backend.
+
+```typescript
+// src/api/types.ts
+
+export interface Document {
+  id: string;
+  name: string;
+  path: string;
+  type: string;
+  size: number;
+  created_at: string;
+  processed: boolean;
+}
+
+export interface ChatRequest {
+  message: string;
+  model: string;   // e.g. "qwen2.5:3b" or "gpt-4o"
+  provider: "ollama" | "openai" | "gemini";
+  stream: boolean;
+}
+
+export interface ChatResponse {
+  response: string;
+  context_used: boolean;
+  sources: string[];
+}
+
+export interface SearchResult {
+  id: string;
+  text: string;
+  score: number;
+  metadata: Record<string, any>;
+}
+
+export interface GraphStats {
+  node_count: number;
+  edge_count: number;
+  density: number;
+}
+```
+
+## 📂 Recommended Folder Structure
+```
+src/
+├── api/          # Axios client & types
+├── components/   # Reusable UI components
+│   ├── ui/       # Shadcn primitives (Button, Input, etc.)
+│   ├── chat/     # Chat-specific components
+│   └── shared/   # Layouts, Headers, Sidebar
+├── hooks/        # React hooks (useChat, useDocuments)
+├── pages/        # Route pages
+├── store/        # Zustand store (useSettingsStore)
+└── lib/          # Utils (cn, formatters)
+```
