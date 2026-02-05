@@ -12,6 +12,11 @@ class Settings(BaseSettings):
     # Database
     KUZU_DB_PATH: str = os.getenv("KUZU_DB_PATH", "./data/mind_q_db")
     CHROMA_DB_PATH: str = os.getenv("CHROMA_DB_PATH", "./data/chroma_db")
+
+    # LLM - LlamaCpp
+    LLAMACPP_MODEL_PATH: str = os.getenv("LLAMACPP_MODEL_PATH", "./models/mistral-7b-instruct-v0.2.Q4_K_M.gguf")
+    LLAMACPP_N_CTX: int = int(os.getenv("LLAMACPP_N_CTX", 2048))
+    LLAMACPP_N_GPU_LAYERS: int = int(os.getenv("LLAMACPP_N_GPU_LAYERS", -1))
     
     class Config:
         env_file = ".env"

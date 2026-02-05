@@ -32,6 +32,7 @@ class ChatResponse(BaseModel):
 from mind_q_agent.llm.providers.ollama import OllamaProvider
 from mind_q_agent.llm.providers.openai import OpenAIProvider
 from mind_q_agent.llm.providers.gemini import GeminiProvider
+from mind_q_agent.llm.providers.llamacpp import LlamaCppProvider
 
 # Dependency (Singleton-like)
 class ChatService:
@@ -45,6 +46,8 @@ class ChatService:
             return OpenAIProvider(config)
         elif provider_name == "gemini":
             return GeminiProvider(config)
+        elif provider_name == "llamacpp":
+            return LlamaCppProvider(config)
         else:
              raise ValueError(f"Provider {provider_name} not supported")
         
@@ -115,6 +118,8 @@ async def chat(req: ChatRequest):
                      provider = OpenAIProvider(config)
                 elif req.provider == "gemini":
                      provider = GeminiProvider(config)
+                elif req.provider == "llamacpp":
+                     provider = LlamaCppProvider(config)
                 else:
                      raise ValueError(f"Provider {req.provider} not supported")
                 
