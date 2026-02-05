@@ -1,0 +1,91 @@
+{
+    "name": "Daily Mind-Q Digest",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "hours",
+                            "hours": 24
+                        }
+                    ]
+                }
+            },
+            "name": "Schedule",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1,
+            "position": [
+                460,
+                460
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "recent",
+                "timeRange": 24,
+                "maxResults": 20
+            },
+            "name": "Get Recent Docs",
+            "type": "n8n-nodes-mindq.mindQSearch",
+            "typeVersion": 1,
+            "position": [
+                680,
+                460
+            ],
+            "credentials": {
+                "mindQApi": {
+                    "id": "1",
+                    "name": "Mind-Q API"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "message": "Here is your daily digest:\n\n{{$json}}",
+                "subject": "Mind-Q Daily Digest"
+            },
+            "name": "Send Email",
+            "type": "n8n-nodes-base.emailSend",
+            "typeVersion": 1,
+            "position": [
+                900,
+                460
+            ]
+        }
+    ],
+    "connections": {
+        "Schedule": {
+            "main": [
+                [
+                    {
+                        "node": "Get Recent Docs",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Get Recent Docs": {
+            "main": [
+                [
+                    {
+                        "node": "Send Email",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "meta": {
+        "description": "Get a daily email summary of new documents in Mind-Q",
+        "parameters": [
+            {
+                "name": "email",
+                "type": "string",
+                "description": "Email address to send digest to"
+            }
+        ]
+    }
+}

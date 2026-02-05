@@ -6,6 +6,7 @@ import DocumentsPage from './pages/DocumentsPage';
 import SearchPage from './pages/SearchPage';
 import GraphPage from './pages/GraphPage';
 import SettingsPage from './pages/SettingsPage';
+import AutomationPage from './pages/AutomationPage';
 
 const App: React.FC = () => {
   return (
@@ -16,6 +17,7 @@ const App: React.FC = () => {
           <Route path="documents" element={<DocumentsPage />} />
           <Route path="search" element={<SearchPage />} />
           <Route path="graph" element={<GraphPage />} />
+          <Route path="automation" element={<AutomationPage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>

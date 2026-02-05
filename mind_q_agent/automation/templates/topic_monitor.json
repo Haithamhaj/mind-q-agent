@@ -1,0 +1,67 @@
+{
+    "name": "Topic Monitor",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "minutes",
+                            "minutes": 360
+                        }
+                    ]
+                }
+            },
+            "name": "Schedule",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1,
+            "position": [
+                460,
+                460
+            ]
+        },
+        {
+            "parameters": {
+                "query": "{{topic}}",
+                "searchType": "semantic",
+                "maxResults": 5
+            },
+            "name": "Search Mind-Q",
+            "type": "n8n-nodes-mindq.mindQSearch",
+            "typeVersion": 1,
+            "position": [
+                680,
+                460
+            ],
+            "credentials": {
+                "mindQApi": {
+                    "id": "1",
+                    "name": "Mind-Q API"
+                }
+            }
+        }
+    ],
+    "connections": {
+        "Schedule": {
+            "main": [
+                [
+                    {
+                        "node": "Search Mind-Q",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "meta": {
+        "description": "Monitor a specific topic and get updates",
+        "parameters": [
+            {
+                "name": "topic",
+                "type": "string",
+                "description": "Topic to monitor"
+            }
+        ]
+    }
+}

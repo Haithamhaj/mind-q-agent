@@ -1,13 +1,37 @@
 {
   "name": "n8n-nodes-mindq",
   "version": "1.0.0",
-  "description": "",
+  "description": "Mind-Q custom nodes for n8n",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "test": "jest"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs"
+  "n8n": {
+    "nodes": [
+      "dist/nodes/MindQSearch/MindQSearch.node.js",
+      "dist/nodes/MindQAddDocument/MindQAddDocument.node.js",
+      "dist/nodes/MindQGetConcepts/MindQGetConcepts.node.js",
+      "dist/nodes/MindQAskQuestion/MindQAskQuestion.node.js"
+    ],
+    "credentials": [
+      "dist/credentials/MindQApi.credentials.js"
+    ]
+  },
+  "keywords": [
+    "n8n-community-node-package"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "n8n-core": "^0.150.0",
+    "n8n-workflow": "^0.140.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.0.0",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.0.0"
+  }
 }

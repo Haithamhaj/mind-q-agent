@@ -6,6 +6,7 @@ from fastapi.responses import StreamingResponse
 import logging
 from mind_q_agent.llm.processing import response_processor
 from mind_q_agent.llm.config import ModelConfig
+from mind_q_agent.rag.context import ContextBuilder
 
 router = APIRouter(
     prefix="/chat",

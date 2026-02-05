@@ -14,6 +14,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     { icon: Folder, label: 'Library', path: '/documents' },
     { icon: Search, label: 'Search', path: '/search' },
     { icon: Network, label: 'Graph', path: '/graph' },
+    { icon: Box, label: 'Automation', path: '/automation' },
     { icon: Settings, label: 'Settings', path: '/settings' },
   ];
 
