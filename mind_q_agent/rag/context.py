@@ -36,28 +36,23 @@ class ContextBuilder:
             results = self.search_engine.search(query, limit=max_docs)
             
             # 2. Format Context
-            context_str = "You are Mind-Q, an intelligent personal knowledge agent.\n"
-            context_str += "Answer the user's question based strictly on the following context:\n\n"
-            
-            if not results:
-                context_str += "No specific documents found.\n"
-            else:
-                context_str += "--- RETRIEVED DOCUMENTS ---\n"
+            context_str = ""
+            if results:
                 for i, doc in enumerate(results):
-                    # content is in doc['content'] or similar based on SearchEngine implementation
-                    # Let's assume standard Chroma result structure or SearchEngine wrapper output
-                    # The SearchEngine.search returns a list of dicts with 'content', 'metadata' etc.
                     content = doc.get('content', 'No content')[:500] + "..." # Truncate for token limit safety
                     source = doc.get('metadata', {}).get('source', 'Unknown')
-                    
                     context_str += f"[Source: {source}]\n{content}\n\n"
+            else:
+                context_str = "No specific documents found."
             
-            context_str += "--- END CONTEXT ---\n"
-            context_str += "If the answer is not in the context, say so gracefully. Do not hallucinate."
+            # 3. Get Prompt from Manager
+            from mind_q_agent.llm.prompts.manager import prompt_manager
+            system_prompt = prompt_manager.get_system_prompt(context=context_str)
             
-            return context_str
+            return system_prompt
             
         except Exception as e:
             logger.error(f"Error building context: {e}")
-            return "You are Mind-Q, an intelligent assistant. Error retrieving context."
+            from mind_q_agent.llm.prompts.manager import prompt_manager
+            return prompt_manager.get_system_prompt(context="Error retrieving context.")
 
