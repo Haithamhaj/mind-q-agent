@@ -37,9 +37,10 @@ def create_app() -> FastAPI:
     app.include_router(chat.router, prefix=settings.API_prefix)
     
     # Automation Routers
-    from mind_q_agent.api.routers import automation, monitoring
+    from mind_q_agent.api.routers import automation, monitoring, smart_features
     app.include_router(automation.router, prefix=settings.API_prefix)
     app.include_router(monitoring.router, prefix=settings.API_prefix)
+    app.include_router(smart_features.router, prefix=settings.API_prefix)
 
     @app.get("/health")
     async def health_check():
