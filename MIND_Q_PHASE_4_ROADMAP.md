@@ -186,6 +186,12 @@
 ## 🔷 PHASE 4C: FRONTEND UI (Tasks 61-70)
 *The Face of Mind-Q.*
 
+### Design Philosophy 🎨
+> **Inspiration**: Google AI Studio / Material 3.
+> **Core Values**: Clean, Content-First, Minimalist, "Floating" Panels.
+> **Theme**: Neutral Grayscale with Blue Intentions.
+
+
 ### Task 61: React Setup ⚛️
 - **Goal**: Initialize UI.
 - **Steps**:
@@ -223,6 +229,7 @@
   - [ ] Chat bubble layout.
   - [ ] Markdown rendering.
   - [ ] Streaming support.
+  - [ ] **[USER REQUEST]** Model Quick-Switcher in header.
 - **🧪 Verification**:
   - Chat flow works smoothly without page reload.
 
@@ -244,8 +251,9 @@
 ### Task 68: Settings Page ⚙️
 - **Goal**: Config UI.
 - **Steps**:
-  - [ ] LLM selection dropdown.
-  - [ ] API Key fields.
+  - [ ] LLM selection dropdown (Global default).
+  - [ ] **[USER REQUEST]** Secure API Key Input Fields (OpenAI / Gemini).
+  - [ ] Local Storage persistence for Keys.
 - **🧪 Verification**:
   - Change LLM, verify chat uses new model.
 

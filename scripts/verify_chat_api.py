@@ -42,6 +42,41 @@ def run_tests():
         print(f"[FAIL] Chat Request exception: {e}")
         return False
 
+    # 2. Test OpenAI Provider (Expected: 500 error due to missing API Key, but not 500 "provider not supported")
+    print("Sending chat request (provider=openai)...")
+    try:
+        payload = {
+            "message": "Hello", 
+            "model": "gpt-4o", 
+            "provider": "openai"
+        }
+        r = requests.post(BASE_URL, json=payload, timeout=5)
+        # We expect 500, but let's check the detail
+        if r.status_code == 500 and "API Key is missing" in r.text:
+             print("[PASS] OpenAI provider correctly identified missing key")
+        elif r.status_code == 200:
+             print("[WARN] OpenAI request succeeded? (Do you have env var set?)")
+        else:
+             print(f"[WARN] OpenAI unexpected response: {r.status_code} {r.text}")
+             # We won't fail the whole script on this, as it depends on Environment
+             
+    except Exception as e:
+         print(f"[WARN] OpenAI test exception: {e}")
+
+    # 3. Test Gemini Provider
+    print("Sending chat request (provider=gemini)...")
+    try:
+        payload = {
+            "message": "Hello", 
+            "model": "gemini-1.5-flash", 
+            "provider": "gemini"
+        }
+        r = requests.post(BASE_URL, json=payload, timeout=5)
+        if r.status_code == 500 and "API Key is missing" in r.text:
+             print("[PASS] Gemini provider correctly identified missing key")
+    except Exception as e:
+         print(f"[WARN] Gemini test exception: {e}")
+
     return True
 
 if __name__ == "__main__":

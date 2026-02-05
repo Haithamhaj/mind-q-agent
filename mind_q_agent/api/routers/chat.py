@@ -6,7 +6,6 @@ from fastapi.responses import StreamingResponse
 import logging
 from mind_q_agent.rag.context import ContextBuilder
 from mind_q_agent.llm.config import ModelConfig
-from mind_q_agent.llm.providers.ollama import OllamaProvider
 
 router = APIRouter(
     prefix="/chat",
@@ -30,27 +29,37 @@ class ChatResponse(BaseModel):
     sources: List[str] = []
 
 # Dependency (Singleton-like)
+from mind_q_agent.llm.providers.ollama import OllamaProvider
+from mind_q_agent.llm.providers.openai import OpenAIProvider
+from mind_q_agent.llm.providers.gemini import GeminiProvider
+
+# Dependency (Singleton-like)
 class ChatService:
     def __init__(self):
         self.context_builder = ContextBuilder()
+    
+    def _get_provider(self, provider_name: str, config: ModelConfig):
+        if provider_name == "ollama":
+            return OllamaProvider(config)
+        elif provider_name == "openai":
+            return OpenAIProvider(config)
+        elif provider_name == "gemini":
+            return GeminiProvider(config)
+        else:
+             raise ValueError(f"Provider {provider_name} not supported")
         
     async def get_response(self, req: ChatRequest):
         # 1. Build Context
         system_prompt = self.context_builder.build_system_prompt(req.message)
         
         # 2. Init Provider
-        # In prod, we'd reuse providers or have a factory
         config = ModelConfig(
             provider=req.provider,
             model_name=req.model,
             temperature=req.temperature
         )
         
-        if req.provider == "ollama":
-            provider = OllamaProvider(config)
-        else:
-            # Fallback or error
-            raise ValueError(f"Provider {req.provider} not supported yet")
+        provider = self._get_provider(req.provider, config)
             
         try:
             if req.stream:
@@ -97,7 +106,17 @@ async def chat(req: ChatRequest):
                     model_name=req.model,
                     temperature=req.temperature
                 )
-                provider = OllamaProvider(config)
+                
+                # Use the new factory method (conceptually, though _get_provider is instance method)
+                # Ideally ChatService should expose a get_provider method publically or we duplicate logic for now (KISS)
+                if req.provider == "ollama":
+                     provider = OllamaProvider(config)
+                elif req.provider == "openai":
+                     provider = OpenAIProvider(config)
+                elif req.provider == "gemini":
+                     provider = GeminiProvider(config)
+                else:
+                     raise ValueError(f"Provider {req.provider} not supported")
                 
                 try:
                     async for chunk in provider.stream(req.message, system_prompt=system_prompt):
